@@ -1,19 +1,20 @@
 // 1. Importamos las herramientas necesarias
 import { Router } from 'express'; // Router es como una "mini-aplicación" de Express para manejar rutas.
-import { registerUserController } from '../controllers/user.controller'; // Importamos el controlador que atenderá la petición.
+import { registerUserController, loginUserController, getUserProfileController } from '../controllers/user.controller'; 
+import { authMiddleware } from '../middlewares/auth.middleware';
 
 // 2. Creamos una nueva instancia del Router
 const userRoutes = Router();
 
-// 3. Definimos las rutas para este módulo
-// Le decimos al router: "Cuando recibas una petición POST en la ruta raíz ('/'),
-// ejecuta la función registerUserController".
-// La ruta completa será definida cuando conectemos este router a la app principal.
+// --- Rutas Públicas (no necesitan token) ---
 userRoutes.post('/register', registerUserController);
+userRoutes.post('/login', loginUserController);
 
-// Podríamos añadir más rutas aquí en el futuro...
-// userRoutes.post('/login', loginUserController);
-// userRoutes.get('/', getAllUsersController);
+// --- Rutas Privadas (requieren un token válido) ---
+// Aquí está la clave: pasamos 'authMiddleware' como el SEGUNDO argumento.
+// Express lo ejecutará primero. Si authMiddleware llama a next(), entonces se ejecutará getUserProfileController.
+// Si no, la petición morirá en el middleware.
+userRoutes.get('/me', authMiddleware, getUserProfileController);
 
 // 4. Exportamos el router para que nuestra aplicación principal pueda usarlo
 export default userRoutes;

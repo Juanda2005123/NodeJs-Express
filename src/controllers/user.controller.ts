@@ -1,6 +1,6 @@
 // 1. Importaciones necesarias
 import { type Request, type Response } from 'express'; // Importamos los tipos de Express
-import { createUserService } from '../services/user.service'; // Importamos nuestro servicio
+import { createUserService, loginUserService, getUserByIdService } from '../services/user.service'; // Importamos nuestro servicio
 import { type IUser } from '../models/User.model'; // Importamos el tipo para el cuerpo de la respuesta
 
 /**
@@ -50,5 +50,59 @@ export const registerUserController = async (req: Request, res: Response) => {
     // Para cualquier otro error, enviamos un error genérico del servidor.
     console.error('Error en registerUserController:', error); // Es buena práctica registrar el error en la consola del servidor.
     return res.status(500).json({ message: 'Error interno del servidor al registrar el usuario' });
+  }
+};
+
+export const loginUserController = async (req: Request, res: Response) => {
+  try {
+    // 1. Extraer email y contraseña del cuerpo de la petición.
+    const { email, password } = req.body;
+
+    // 2. Validar que los datos necesarios fueron enviados.
+    if (!email || !password) {
+      return res.status(400).json({ message: 'El email y la contraseña son requeridos.' });
+    }
+
+    // 3. Llamar al servicio de login.
+    const data = await loginUserService(email, password);
+
+    // 4. Si el login es exitoso, enviar la respuesta con el token.
+    return res.status(200).json({
+      message: 'Login exitoso',
+      token: data.token,
+      user: data.user
+    });
+
+  } catch (error: any) {
+    // 5. Si el servicio lanza un error (ej. "Credenciales inválidas"), lo atrapamos.
+    // Damos una respuesta genérica de "No autorizado".
+    return res.status(401).json({ message: error.message || 'Error de autenticación' });
+  }
+};
+
+/**
+ * Controlador para obtener el perfil del usuario actualmente autenticado.
+ */
+export const getUserProfileController = async (req: Request, res: Response) => {
+  try {
+    // 1. ¡La Magia del Middleware!
+    // Gracias al authMiddleware, sabemos con certeza que req.user existe y tiene el ID del usuario.
+    // Usamos el 'Non-null assertion operator' (!) porque estamos seguros de que no será undefined.
+    const userId = req.user!.id;
+
+    // 2. Llamamos al servicio para obtener los datos del usuario.
+    const userProfile = await getUserByIdService(userId);
+
+    // 3. Manejamos el caso (muy improbable) de que no se encuentre el usuario.
+    if (!userProfile) {
+      return res.status(404).json({ message: 'Perfil de usuario no encontrado.' });
+    }
+
+    // 4. Enviamos el perfil del usuario como respuesta.
+    return res.status(200).json(userProfile);
+
+  } catch (error) {
+    console.error('Error en getUserProfileController:', error);
+    return res.status(500).json({ message: 'Error interno del servidor al obtener el perfil.' });
   }
 };
