@@ -32,3 +32,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Finder (MacOS) folder config
 .DS_Store
+# Local Data Storage
+# Ignora la carpeta que contiene los datos de la base de datos local de Docker
+mongo-data/
