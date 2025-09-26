@@ -1,0 +1,18 @@
+# Definición de los servicios (contenedores)
+services:
+  # Nuestro servicio de base de datos MongoDB
+  db_mongo:
+    image: mongo:latest # Usaremos la última imagen oficial de MongoDB
+    container_name: inmobiliaria_mongo_db # Un nombre amigable para nuestro contenedor
+    restart: always # Que se reinicie automáticamente si falla
+    ports:
+      - "27017:27017" # Mapea el puerto de tu PC al puerto del contenedor
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER} # Usuario root, cargado desde .env
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD} # Password root, cargado desde .env
+    volumes:
+      - ./mongo-data:/data/db # Guarda los datos de la DB en una carpeta local
+
+# Definición de los volúmenes
+volumes:
+  mongo-data:
