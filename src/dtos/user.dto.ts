@@ -53,3 +53,32 @@ export interface UpdateUserByAdminDto {
   password?: string;
   role?:     'superadmin' | 'agente';
 }
+
+/**
+ * @description Define la forma segura de un objeto de Usuario que se envía al cliente.
+ * Excluye campos sensibles como la contraseña.
+ */
+export interface UserResponseDto {
+  id: string;
+  name: string;
+  email: string;
+  role: 'superadmin' | 'agente';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * @description Define la forma de la respuesta de autenticación (login y registro).
+ */
+export interface AuthResponseDto {
+  token: string;
+  user: UserResponseDto;
+}
+
+/**
+ * @description Define la forma de la respuesta al listar usuarios.
+ */
+export interface UserListResponseDto {
+  users: UserResponseDto[];
+  total: number;
+}

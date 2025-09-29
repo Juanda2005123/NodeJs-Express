@@ -1,7 +1,8 @@
 // 1. Importaciones necesarias
 import { type Request, type Response, type NextFunction } from 'express'; 
 import { registerUserService, loginUserService, getUserByIdService, getAllUsersService, createUserService, updateUserProfileService, updateUserByAdminService, deleteUserByIdService } from '../services/user.service';
-import { type RegisterUserDto, type LoginUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto } from '../dtos/user.dto';
+import { type RegisterUserDto, type LoginUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto, type UserListResponseDto } from '../dtos/user.dto';
+import { serializeUser } from '../utils/user.serializer';
 // --- Controladores Públicos ---
 
 /**
@@ -20,7 +21,7 @@ export const registerUserController = async (req: Request, res: Response, next: 
     };
 
     const newUser = await registerUserService(registerData);
-    const userResponse = { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role };
+    const userResponse = serializeUser(newUser);
     return res.status(201).json({ message: 'Usuario registrado exitosamente', user: userResponse });
   } catch (error) {
     next(error);
@@ -42,8 +43,18 @@ export const loginUserController = async (req: Request, res: Response, next: Nex
     if (!loginData.email || !loginData.password) {
       return res.status(400).json({ message: 'El email y la contraseña son requeridos.' });
     }
-    const data = await loginUserService(loginData.email, loginData.password);
-    return res.status(200).json({ message: 'Login exitoso', ...data });
+    
+    // El servicio devuelve { token, user } donde user es el modelo completo
+    const { token, user } = await loginUserService(loginData.email, loginData.password);
+    
+    // Aquí serializamos para crear la respuesta segura
+    const userResponse = serializeUser(user);
+    
+    return res.status(200).json({ 
+      message: 'Login exitoso', 
+      token,
+      user: userResponse 
+    });
   } catch (error) {
     // Los errores de login específicos (ej. "Credenciales inválidas") se manejarán con un código 401.
     return res.status(401).json({ message: (error as Error).message });
@@ -62,11 +73,17 @@ export const loginUserController = async (req: Request, res: Response, next: Nex
 export const getUserProfileController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
-    const userProfile = await getUserByIdService(userId);
-    if (!userProfile) {
+    
+    // El servicio devuelve el modelo completo o null
+    const user = await getUserByIdService(userId);
+    if (!user) {
       return res.status(404).json({ message: 'Perfil de usuario no encontrado.' });
     }
-    return res.status(200).json(userProfile);
+    
+    // Aquí serializamos para crear la respuesta segura
+    const userResponse = serializeUser(user);
+    
+    return res.status(200).json(userResponse);
   } catch (error) {
     next(error);
   }
@@ -102,7 +119,8 @@ export const updateUserProfileController = async (req: Request, res: Response, n
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
-    return res.status(200).json(updatedUser);
+    const userResponse = serializeUser(updatedUser);
+    return res.status(200).json(userResponse);
   } catch (error) {
     next(error);
   }
@@ -144,7 +162,7 @@ export const createUserController = async (req: Request, res: Response, next: Ne
     };
 
     const newUser = await createUserService(createData);
-    const userResponse = { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role };
+    const userResponse = serializeUser(newUser);
     return res.status(201).json({ message: 'Usuario creado exitosamente por el administrador', user: userResponse });
   } catch (error) {
     next(error);
@@ -160,7 +178,17 @@ export const createUserController = async (req: Request, res: Response, next: Ne
 export const getAllUsersController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await getAllUsersService();
-    return res.status(200).json(users);
+    const usersResponse = users.map(user => serializeUser(user));
+    
+    const response: UserListResponseDto = {
+      users: usersResponse,
+      total: usersResponse.length
+    };
+    
+    return res.status(200).json({
+      message: 'Usuarios obtenidos exitosamente',
+      ...response
+    });
   } catch (error) {
     next(error);
   }
@@ -178,11 +206,17 @@ export const getUserByIdController = async (req: Request, res: Response, next: N
     if (!id) {
       return res.status(400).json({ message: 'El ID del usuario es requerido.' });
     }
-    const userProfile = await getUserByIdService(id);
-    if (!userProfile) {
+    
+    // El servicio devuelve el modelo completo o null
+    const user = await getUserByIdService(id);
+    if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
-    return res.status(200).json(userProfile);
+    
+    // Aquí serializamos para crear la respuesta segura
+    const userResponse = serializeUser(user);
+    
+    return res.status(200).json(userResponse);
   } catch (error) {
     next(error);
   }
@@ -217,11 +251,12 @@ export const updateUserByAdminController = async (req: Request, res: Response, n
     }
 
     const updatedUser = await updateUserByAdminService(id, updateData);
-    
+
     if (!updatedUser) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
-    return res.status(200).json(updatedUser);
+    const userResponse = serializeUser(updatedUser);
+    return res.status(200).json(userResponse);
   } catch (error) {
     next(error);
   }

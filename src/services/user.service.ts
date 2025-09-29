@@ -2,7 +2,7 @@ import UserModel, { type IUser } from '../models/User.model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
 import dotenv from 'dotenv'; 
-import { type RegisterUserDto, type LoginUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto } from '../dtos/user.dto';
+import { type RegisterUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto } from '../dtos/user.dto';
 
 /**
  * Servicio para la lógica de negocio relacionada con los usuarios.
@@ -60,7 +60,7 @@ export const createUserService = async (userData: CreateUserDto) => {
  * Servicio para autenticar a un usuario y generar un token JWT.
  * @param email - El email del usuario que intenta iniciar sesión.
  * @param password - La contraseña en texto plano que envía el usuario.
- * @returns Un objeto con el token y los datos del usuario si las credenciales son correctas.
+ * @returns Un objeto con el token y el modelo de usuario completo.
  * @throws Lanza un error si el usuario no se encuentra o la contraseña es incorrecta.
  */
 export const loginUserService = async (email: string, password: string) => {
@@ -97,15 +97,8 @@ export const loginUserService = async (email: string, password: string) => {
 
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' }); // El token expirará en 1 hora
 
-    // 6. Devolvemos el token y la información del usuario (sin la contraseña).
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    };
-
-    return { token, user: userResponse };
+    // 6. Devolvemos el token y el modelo completo del usuario (el controller se encarga de serializar).
+    return { token, user };
 
   } catch (error) {
     // Relanzamos el error para que el controlador lo maneje.
@@ -116,7 +109,7 @@ export const loginUserService = async (email: string, password: string) => {
 /**
  * Busca un único usuario por su ID en la base de datos.
  * @param id - El ID del usuario a buscar.
- * @returns El documento del usuario encontrado (sin la contraseña) o null si no se encuentra.
+ * @returns El documento completo del usuario (modelo de Mongoose) o null si no se encuentra.
  * @throws Lanza un error si la operación de búsqueda falla.
  */
 export const getUserByIdService = async (id: string) => {
@@ -129,17 +122,8 @@ export const getUserByIdService = async (id: string) => {
       return null;
     }
 
-    // 3. NUNCA devolvemos la contraseña. Creamos un objeto de respuesta seguro.
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    };
-
-    return userResponse;
+    // 3. Devolvemos el modelo completo (el controller se encarga de serializar)
+    return user;
 
   } catch (error) {
     // Relanzamos el error para que el controlador lo maneje.
