@@ -69,7 +69,7 @@ export interface UpdatePropertyByAdminDto {
 
 /**
  * @description Define la forma segura de un objeto de Propiedad que se envía al cliente.
- * El 'owner' puede ser un ID o el objeto de usuario completo (poblado).
+ * El 'owner' puede ser un ID string (en Task responses) o el objeto UserResponseDto completo (en Property responses).
  */
 export interface PropertyResponseDto {
   id:          string;
@@ -81,7 +81,7 @@ export interface PropertyResponseDto {
   bathrooms:   number;
   area:        number;
   imageUrls:   string[];
-  owner:       string | UserResponseDto; // <-- Puede ser el ID o el DTO del usuario
+  owner:       string | UserResponseDto; // <-- ID string en Task responses, UserResponseDto en Property responses
   createdAt:   Date;
   updatedAt:   Date;
 }

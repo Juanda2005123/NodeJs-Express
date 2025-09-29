@@ -21,6 +21,11 @@ export const registerUserController = async (req: Request, res: Response, next: 
     };
 
     const newUser = await registerUserService(registerData);
+    
+    if (!newUser) {
+      return res.status(400).json({ message: 'Error registrando el usuario. Verifique los datos.' });
+    }
+    
     const userResponse = serializeUser(newUser);
     return res.status(201).json({ message: 'Usuario registrado exitosamente', user: userResponse });
   } catch (error) {
@@ -56,8 +61,7 @@ export const loginUserController = async (req: Request, res: Response, next: Nex
       user: userResponse 
     });
   } catch (error) {
-    // Los errores de login específicos (ej. "Credenciales inválidas") se manejarán con un código 401.
-    return res.status(401).json({ message: (error as Error).message });
+    next(error);
   }
 };
 
@@ -120,7 +124,10 @@ export const updateUserProfileController = async (req: Request, res: Response, n
     }
 
     const userResponse = serializeUser(updatedUser);
-    return res.status(200).json(userResponse);
+    return res.status(200).json({ 
+      message: 'Perfil actualizado exitosamente', 
+      user: userResponse 
+    });
   } catch (error) {
     next(error);
   }
@@ -135,7 +142,12 @@ export const updateUserProfileController = async (req: Request, res: Response, n
 export const deleteUserAccountController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
-    await deleteUserByIdService(userId);
+    const deletedUser = await deleteUserByIdService(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
     return res.status(204).send();
   } catch (error) {
     next(error);
@@ -162,6 +174,11 @@ export const createUserController = async (req: Request, res: Response, next: Ne
     };
 
     const newUser = await createUserService(createData);
+    
+    if (!newUser) {
+      return res.status(400).json({ message: 'Error creando el usuario. Verifique los datos.' });
+    }
+    
     const userResponse = serializeUser(newUser);
     return res.status(201).json({ message: 'Usuario creado exitosamente por el administrador', user: userResponse });
   } catch (error) {
@@ -185,10 +202,7 @@ export const getAllUsersController = async (req: Request, res: Response, next: N
       total: usersResponse.length
     };
     
-    return res.status(200).json({
-      message: 'Usuarios obtenidos exitosamente',
-      ...response
-    });
+    return res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -202,13 +216,13 @@ export const getAllUsersController = async (req: Request, res: Response, next: N
  */
 export const getUserByIdController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    if (!id) {
+    const { id: userId } = req.params;
+    if (!userId) {
       return res.status(400).json({ message: 'El ID del usuario es requerido.' });
     }
     
     // El servicio devuelve el modelo completo o null
-    const user = await getUserByIdService(id);
+    const user = await getUserByIdService(userId);
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
@@ -230,8 +244,8 @@ export const getUserByIdController = async (req: Request, res: Response, next: N
  */
 export const updateUserByAdminController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    if (!id) {
+    const { id: userId } = req.params;
+    if (!userId) {
       return res.status(400).json({ message: 'El ID del usuario es requerido.' });
     }
 
@@ -250,13 +264,16 @@ export const updateUserByAdminController = async (req: Request, res: Response, n
       return res.status(400).json({ message: 'No se proporcionaron datos válidos para actualizar.' });
     }
 
-    const updatedUser = await updateUserByAdminService(id, updateData);
+    const updatedUser = await updateUserByAdminService(userId, updateData);
 
     if (!updatedUser) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
     const userResponse = serializeUser(updatedUser);
-    return res.status(200).json(userResponse);
+    return res.status(200).json({ 
+      message: 'Usuario actualizado exitosamente por el administrador', 
+      user: userResponse 
+    });
   } catch (error) {
     next(error);
   }
@@ -270,11 +287,17 @@ export const updateUserByAdminController = async (req: Request, res: Response, n
  */
 export const deleteUserByAdminController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    if (!id) {
+    const { id: userId } = req.params;
+    if (!userId) {
       return res.status(400).json({ message: 'El ID del usuario es requerido.' });
     }
-    await deleteUserByIdService(id);
+
+    const deletedUser = await deleteUserByIdService(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
     return res.status(204).send();
   } catch (error) {
     next(error);

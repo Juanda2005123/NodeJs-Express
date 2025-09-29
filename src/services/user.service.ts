@@ -1,4 +1,5 @@
-import UserModel, { type IUser } from '../models/User.model';
+import UserModel from '../models/User.model';
+import PropertyModel from '../models/Property.model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
 import dotenv from 'dotenv'; 
@@ -72,7 +73,9 @@ export const loginUserService = async (email: string, password: string) => {
     // 2. Si el usuario no existe, lanzamos un error de autenticación.
     // ¡Importante! No decimos "email no encontrado" para no dar pistas a posibles atacantes.
     if (!user) {
-      throw new Error('Credenciales inválidas');
+      const error = new Error('Credenciales inválidas');
+      (error as any).statusCode = 401;
+      throw error;
     }
 
     // 3. Comparar la contraseña enviada con la contraseña hasheada en la base de datos.
@@ -80,7 +83,9 @@ export const loginUserService = async (email: string, password: string) => {
 
     // 4. Si las contraseñas no coinciden, lanzamos el mismo error genérico.
     if (!isPasswordMatch) {
-      throw new Error('Credenciales inválidas');
+      const error = new Error('Credenciales inválidas');
+      (error as any).statusCode = 401;
+      throw error;
     }
 
     // 5. Si todo es correcto, generamos el token JWT.
@@ -194,12 +199,28 @@ export const updateUserByAdminService = async (userId: string, updateData: Updat
 
 /**
  * @description Servicio para eliminar un usuario por su ID.
+ * Incluye validación de dependencias: no permite eliminar si tiene propiedades asignadas.
  * @param userId - El ID del usuario a eliminar.
  * @returns El documento del usuario que fue eliminado o null si no se encontró.
+ * @throws Lanza un error si el usuario tiene propiedades asignadas.
  */
 export const deleteUserByIdService = async (userId: string) => {
   try {
+    // VALIDACIÓN DE DEPENDENCIAS: Verificar si el usuario tiene propiedades
+    const userProperties = await PropertyModel.find({ owner: userId }).limit(1);
+    
+    if (userProperties.length > 0) {
+      const error = new Error('No se puede eliminar el usuario: tiene propiedades asignadas. Elimine primero todas sus propiedades.');
+      (error as any).statusCode = 409; // Conflict
+      throw error;
+    }
+
     const deletedUser = await UserModel.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return null;
+    }
+
     return deletedUser;
   } catch (error) {
     throw error;

@@ -50,15 +50,15 @@ export interface UpdateTaskByAdminDto {
 
 /**
  * @description Define la forma segura de un objeto de Tarea que se envía al cliente.
- * Los campos 'property' y 'assignedTo' pueden ser IDs o objetos poblados.
+ * Los campos 'property' y 'assignedTo' siempre son objetos poblados.
  */
 export interface TaskResponseDto {
   id:          string;
   title:       string;
   description: string;
   isCompleted: boolean;
-  property:    string | PropertyResponseDto; // ID o objeto poblado de la propiedad
-  assignedTo:  string | UserResponseDto;     // ID o objeto poblado del usuario asignado
+  property:    PropertyResponseDto; // Siempre es el objeto completo de la propiedad
+  assignedTo:  UserResponseDto;     // Siempre es el objeto completo del usuario asignado
   createdAt:   Date;
   updatedAt:   Date;
 }

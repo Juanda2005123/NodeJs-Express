@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import userRoutes from './routes/user.routes';
 import { errorHandlerMiddleware } from './middlewares/errorHandler.middleware';
+import propertyRoutes from './routes/property.routes';
+import taskRoutes from './routes/task.routes';
 
 
 // 1. Cargar las variables de entorno del archivo .env
@@ -29,7 +31,8 @@ app.get('/api', (req: Request, res: Response) => {
 // Le decimos a Express: "Cualquier petición que empiece con '/api/users',
 // pásasela al router 'userRoutes' para que él decida qué hacer."
 app.use('/api/users', userRoutes);
-
+app.use('/api/properties', propertyRoutes);
+app.use('/api/tasks', taskRoutes);
 app.use(errorHandlerMiddleware);
 
 

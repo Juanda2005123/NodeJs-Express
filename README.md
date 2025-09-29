@@ -24,25 +24,29 @@
 - [⚡ Instalación y Configuración](#-instalación-y-configuración)
 - [🚀 Ejecución del Proyecto](#-ejecución-del-proyecto)
 - [📡 Uso de la API (Endpoints)](#-uso-de-la-api-endpoints)
-- [🧪 Pruebas con Postman](#-pruebas-con-postman)
+- [🧪 Pruebas](#-pruebas)
+- [🏗️ Arquitectura y Características Técnicas](#️-arquitectura-y-características-técnicas)
 - [☁️ Despliegue](#️-despliegue)
-- [📈 Roadmap del Proyecto](#-roadmap-del-proyecto)
+- [📈 Estado del Proyecto](#-estado-del-proyecto)
+- [📚 Cumplimiento de Requisitos](#-cumplimiento-de-requisitos)
 
 ---
 
 ## 🎯 Descripción del Proyecto
 
-El objetivo de este proyecto es desarrollar una API backend para una herramienta interna de una agencia inmobiliaria. La aplicación permite gestionar usuarios (con roles de `superadmin` y `agente`), propiedades y las tareas asociadas a dichas propiedades.
+API backend completa para una herramienta interna de una agencia inmobiliaria desarrollada como parte del taller "Backend - NodeJS" de Computación en Internet III. La aplicación implementa un sistema robusto de gestión de usuarios, propiedades y tareas con autenticación JWT, roles diferenciados y integridad referencial.
 
-### ✨ Funcionalidades Principales
+### ✨ Funcionalidades Implementadas
 
-- **👥 Gestión de Usuarios:** Sistema completo de CRUD para usuarios con roles
-- **🔐 Autenticación y Autorización:** Implementación de seguridad basada en JSON Web Tokens (JWT)
-- **🛡️ Roles y Permisos:** Dos niveles de acceso:
-  - `superadmin`: Control total sobre todos los usuarios, propiedades y tareas
-  - `agente`: Puede gestionar las propiedades y tareas que se le asignan
-- **🏠 Gestión de Propiedades:** *(Futuro Módulo)* CRUD para las propiedades de la agencia
-- **📝 Gestión de Tareas:** *(Futuro Módulo)* CRUD para las tareas asociadas a las propiedades
+- **👥 Gestión de Usuarios:** Sistema completo de CRUD con roles y autenticación JWT
+- **🔐 Autenticación y Autorización:** Seguridad basada en JSON Web Tokens con middleware de roles
+- **🛡️ Roles y Permisos:** Dos niveles de acceso diferenciados:
+  - `superadmin`: Control total sobre todos los módulos (usuarios, propiedades, tareas)
+  - `agente`: Gestión de sus propias propiedades y tareas asignadas
+- **🏠 Gestión de Propiedades:** CRUD completo con ownership y control de acceso por roles
+- **📝 Gestión de Tareas:** CRUD completo vinculado a propiedades con asignación automática
+- **🔄 Integridad Referencial:** Cascade delete y validación de dependencias
+- **⚡ Optimizaciones:** Filtros combinados en MongoDB y centralización de errores
 
 ---
 
@@ -57,6 +61,8 @@ El objetivo de este proyecto es desarrollar una API backend para una herramienta
 | **ODM** | Mongoose |
 | **Seguridad** | JWT, bcrypt |
 | **Contenedores** | Docker Compose |
+| **Arquitectura** | DTOs, Serializers, Service Layer, Middleware |
+| **Patrones** | MVC, Service Layer, Centralized Error Handling |
 
 ---
 
@@ -130,9 +136,9 @@ bun run dev
 
 > **Base URL:** `http://localhost:3000/api`
 
-### 1️⃣ Módulo de Usuarios �
+### 1️⃣ Módulo de Usuarios 👥
 
-#### �🔓 Autenticación Pública
+#### 🔓 Autenticación Pública
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/users/register` | Registra un nuevo usuario (rol: `agente`) |
@@ -143,77 +149,207 @@ bun run dev
 |--------|----------|-------------|------|
 | `GET` | `/users/me` | Obtiene perfil del usuario actual | ✅ |
 | `PUT` | `/users/me` | Actualiza perfil del usuario actual | ✅ |
-| `DELETE` | `/users/me` | Elimina cuenta del usuario actual | ✅ |
+| `DELETE` | `/users/me` | Elimina cuenta del usuario actual* | ✅ |
 
-#### �️ Gestión Administrativa
+#### ⚙️ Gestión Administrativa
 | Método | Endpoint | Descripción | Roles |
 |--------|----------|-------------|--------|
 | `POST` | `/users` | Crea nuevo usuario | `superadmin` |
 | `GET` | `/users` | Lista todos los usuarios | `superadmin` |
 | `GET` | `/users/:id` | Obtiene usuario por ID | `superadmin` |
 | `PUT` | `/users/:id` | Actualiza usuario por ID | `superadmin` |
-| `DELETE` | `/users/:id` | Elimina usuario por ID | `superadmin` |
+| `DELETE` | `/users/:id` | Elimina usuario por ID* | `superadmin` |
+
+*Solo si no tiene propiedades asignadas
 
 ---
 
-### 2️⃣ Módulo de Propiedades 🏠 
+### 2️⃣ Módulo de Propiedades 🏠
 
-> 🚧 **Estado:** En desarrollo
+#### 🔓 Consultas Públicas
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/properties` | Lista todas las propiedades |
+| `GET` | `/properties/:id` | Obtiene propiedad por ID |
+
+#### 🏡 Gestión de Agente
+| Método | Endpoint | Descripción | Roles |
+|--------|----------|-------------|--------|
+| `POST` | `/properties/agent` | Crea nueva propiedad | `agente` |
+| `PUT` | `/properties/agent/:id` | Actualiza su propiedad | `agente` |
+| `DELETE` | `/properties/agent/:id` | Elimina su propiedad** | `agente` |
+
+#### ⚙️ Gestión Administrativa
+| Método | Endpoint | Descripción | Roles |
+|--------|----------|-------------|--------|
+| `POST` | `/properties/admin` | Crea propiedad (cualquier owner) | `superadmin` |
+| `PUT` | `/properties/admin/:id` | Actualiza cualquier propiedad | `superadmin` |
+| `DELETE` | `/properties/admin/:id` | Elimina cualquier propiedad** | `superadmin` |
+
+**Elimina automáticamente todas las tareas asociadas
 
 ---
 
 ### 3️⃣ Módulo de Tareas 📋
 
-> 🚧 **Estado:** En desarrollo
+#### 👤 Gestión de Agente
+| Método | Endpoint | Descripción | Roles |
+|--------|----------|-------------|--------|
+| `GET` | `/tasks/agent` | Lista sus tareas asignadas | `agente` |
+| `GET` | `/tasks/agent/:id` | Obtiene su tarea por ID | `agente` |
+| `GET` | `/tasks/property/:propertyId` | Tareas de su propiedad | `agente` |
+| `POST` | `/tasks/agent` | Crea tarea en su propiedad | `agente` |
+| `PUT` | `/tasks/agent/:id` | Actualiza su tarea | `agente` |
+| `DELETE` | `/tasks/agent/:id` | Elimina su tarea | `agente` |
+
+#### ⚙️ Gestión Administrativa
+| Método | Endpoint | Descripción | Roles |
+|--------|----------|-------------|--------|
+| `GET` | `/tasks/admin` | Lista todas las tareas | `superadmin` |
+| `GET` | `/tasks/admin/:id` | Obtiene cualquier tarea | `superadmin` |
+| `GET` | `/tasks/admin/property/:propertyId` | Tareas de cualquier propiedad | `superadmin` |
+| `POST` | `/tasks/admin` | Crea tarea en cualquier propiedad | `superadmin` |
+| `PUT` | `/tasks/admin/:id` | Actualiza cualquier tarea | `superadmin` |
+| `DELETE` | `/tasks/admin/:id` | Elimina cualquier tarea | `superadmin` |
 
 ---
 
-## 🧪 Pruebas con Postman
+## 🧪 Pruebas
 
+### 📋 **Pruebas de Integración (Postman)**
 📁 **Colección disponible:** `Inmobiliaria Express - NodeJS.postman_collection.json`
 
-### 🎯 Cómo realizar las pruebas:
+#### 🎯 Cómo realizar las pruebas:
 
 1. **📋 Importa la colección** de Postman en tu workspace
 2. **🗄️ Inicia la base de datos** con `docker-compose up -d`
 3. **🌱 Puebla con datos iniciales** ejecutando `bun run db:seed`
 4. **🚀 Inicia la aplicación** con `bun run dev`
-5. **📂 Abre los folders** en la colección
-6. **▶️ Ejecuta las pruebas** de arriba hacia abajo en orden secuencial
+5. **📂 Abre los folders** en la colección por módulo
+6. **▶️ Ejecuta las pruebas** de manera secuencial
 
-> � **Tip:** Las pruebas están organizadas en folders por módulo. Ejecuta cada folder de manera secuencial para obtener mejores resultados.
-- `{{jwt_token}}` - Token de autenticación
-- `{{jwt_SuperToken}}` - Token de autenticación de super usuario
+#### 🔧 **Variables de Entorno:**
+- `{{jwt_token}}` - Token de autenticación de agente
+- `{{jwt_SuperToken}}` - Token de autenticación de superadmin
 - `{{test_agent_id}}` - ID del agente de prueba
+- `{{base_url}}` - URL base de la API
+
+### 🧪 **Pruebas Unitarias**
+> 🚧 **Estado:** Pendiente de implementación
+
+**Objetivo:** Cobertura del 80% usando Jest
+- **Componentes a probar:** Controladores, servicios, modelos, utilidades
+- **Escenarios:** Casos de éxito y error, validaciones, lógica de negocio
+- **Frameworks:** Jest para testing, Supertest para APIs
+
+---
+
+## 🏗️ Arquitectura y Características Técnicas
+
+### 📊 **Patrones Implementados**
+- **DTO (Data Transfer Objects):** Validación y serialización de datos de entrada
+- **Service Layer:** Lógica de negocio centralizada que interactúa directamente con modelos Mongoose
+- **Serializers:** Formateo y transformación de datos de salida
+- **Middleware Chain:** Autenticación, autorización y manejo centralizado de errores
+
+### 🔄 **Integridad Referencial**
+- **Cascade Delete:** Eliminar propiedad → elimina tareas automáticamente
+- **Dependency Validation:** No permite eliminar usuarios con propiedades
+- **Ownership Control:** Agentes solo gestionan sus recursos
+
+### ⚡ **Optimizaciones**
+- **Filtros Combinados:** Consultas MongoDB optimizadas
+- **Error Handler Centralizado:** Manejo unificado de errores
+- **Populate Strategy:** Carga eficiente de relaciones
+
+### 🛡️ **Seguridad**
+- **JWT Authentication:** Tokens seguros con expiración
+- **Role-based Authorization:** Permisos diferenciados
+- **Password Hashing:** bcrypt con salt
+- **Input Validation:** Validación de entrada en todos los endpoints
 
 ---
 
 ## ☁️ Despliegue
 
-🌐 **API Desplegada:** [URL_DE_TU_API_DESPLEGADA]
+> 🚧 **Estado:** Pendiente de implementación
 
-![Website Status](https://img.shields.io/website?up_message=online&down_message=offline&url=URL_DE_TU_API_DESPLEGADA)
+🌐 **API Desplegada:** [Próximamente]
 
 ---
 
-## 📈 Roadmap del Proyecto (BORRAR LUEGO, ES PARA LLEVAR EL PROGRESO)
+## 📈 Estado del Proyecto
 
-### 🎯 **Fase 1: Módulo de Usuarios** *(En Progreso)*
-- [x] Autenticación básica (Login/Register)
-- [x] Middlewares de autorización
-- [ ] CRUD completo de usuarios (Rutas protegidas)
+### ✅ **Módulos Completados**
 
-### 🏠 **Fase 2: Módulo de Propiedades** *(Planeado)*
-- [ ] Modelo de propiedades
-- [ ] CRUD de propiedades
-- [ ] Asignación de propiedades a agentes
+#### 👥 **Módulo de Usuarios**
+- [x] Autenticación JWT completa (Login/Register)
+- [x] Middlewares de autorización por roles
+- [x] CRUD completo con rutas protegidas
+- [x] Validación de dependencias para eliminación
+- [x] Serialización segura de datos
 
-### 📋 **Fase 3: Módulo de Tareas** *(Futuro)*
-- [ ] Sistema de tareas
-- [ ] Asignación de tareas
-- [ ] Estados y seguimiento
+#### 🏠 **Módulo de Propiedades**
+- [x] Modelo completo con relaciones
+- [x] CRUD diferenciado por roles (agente/superadmin)
+- [x] Ownership y control de acceso
+- [x] Cascade delete de tareas asociadas
+- [x] Rutas públicas y privadas
+
+#### 📋 **Módulo de Tareas**
+- [x] Sistema completo de tareas vinculadas a propiedades
+- [x] Asignación automática basada en ownership
+- [x] CRUD diferenciado por roles
+- [x] Integridad referencial con propiedades
+- [x] Optimizaciones con filtros combinados
+
+### 🚧 **Pendientes de Implementación**
+- [ ] **Pruebas Unitarias:** Cobertura del 80% con Jest
+- [ ] **Despliegue en Nube:** Implementación en plataforma cloud
+- [ ] **Colección Postman:** Pruebas de integración completas
+- [ ] **Documentación Adicional:** Diagramas de arquitectura
+
+---
+
+## 📚 Cumplimiento de Requisitos
+
+### ✅ **Requisitos Funcionales Implementados**
+
+#### 👥 **Gestión de Usuarios**
+- [x] Superadmin puede crear, modificar y eliminar usuarios
+- [x] Roles implementados: `superadmin`, `agente` (usuario regular)
+- [x] Usuarios autenticados pueden ver/editar su perfil
+- [x] Solo superadmin puede gestionar otros usuarios
+
+#### 🔐 **Autenticación y Autorización**
+- [x] Sistema JWT completo con middleware de autenticación
+- [x] Middleware de validación de roles para cada operación
+- [x] Rutas protegidas según permisos de usuario
+
+#### 🏠📋 **Módulos Interrelacionados**
+- [x] **Módulo Propiedades:** CRUD completo con ownership
+- [x] **Módulo Tareas:** CRUD vinculado a propiedades
+- [x] Relación directa entre propiedades y tareas
+- [x] Gestión diferenciada por roles (agente vs superadmin)
+
+#### 🔄 **Características Adicionales**
+- [x] Integridad referencial (cascade delete, validación dependencias)
+- [x] Optimizaciones de rendimiento (filtros combinados)
+- [x] Error handling centralizado
+- [x] Arquitectura escalable con DTOs y Services
+
+### 🚧 **Elementos Pendientes**
+- [ ] **Pruebas Unitarias:** 80% cobertura con Jest
+- [ ] **Pruebas Integración:** Colección Postman completa
+- [ ] **Despliegue:** Implementación en nube
+- [ ] **Documentación:** README técnico detallado
 
 ---
 
 <div align="center">
-  
+
+<p><strong>Desarrollado para Computación en Internet III - Universidad Icesi</strong></p>
+<p><em>Taller: Backend NodeJS - Docente: Gustavo Gonzalez Medina</em></p>
+<p><em>Entrega: 30 de Septiembre 2025</em></p>
+
+</div>

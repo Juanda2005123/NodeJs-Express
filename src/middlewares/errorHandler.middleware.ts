@@ -26,13 +26,23 @@ export const errorHandlerMiddleware = (error: any, req: Request, res: Response, 
     });
   }
 
-  // ¡NUEVO! Error de CastError de Mongoose (ej. ID de MongoDB malformado)
+  // Error de CastError de Mongoose (ej. ID de MongoDB malformado)
   if (error.name === 'CastError' && error.path) {
     return res.status(400).json({
       message: `Error de formato: El valor '${error.value}' no es válido para el campo '${error.path}'.`
     });
   }
 
+  // --- Manejo de Errores Específicos de Lógica de Negocio ---
+  
+  // Si el error tiene un statusCode personalizado, lo manejamos directamente
+  // Códigos manejados: 400 (validación), 401 (no autorizado), 403 (prohibido), 409 (conflicto), etc.
+  // Casos: credenciales inválidas, no es propietario, usuario con dependencias, parámetros faltantes
+  if (error.statusCode && error.statusCode !== 500) {
+    return res.status(error.statusCode).json({
+      message: error.message
+    });
+  }
 
   // --- Manejo de Errores Genéricos (Producción vs. Desarrollo) ---
 
