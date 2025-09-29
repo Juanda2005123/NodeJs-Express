@@ -2,6 +2,8 @@ import UserModel, { type IUser } from '../models/User.model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
 import dotenv from 'dotenv'; 
+import { type RegisterUserDto, type LoginUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto } from '../dtos/user.dto';
+
 /**
  * Servicio para la lógica de negocio relacionada con los usuarios.
  */
@@ -10,11 +12,11 @@ dotenv.config();
 
 /**
  * Registra un nuevo usuario con rol 'agente' en la base de datos.
- * @param userData - Un objeto que cumple con la interfaz IUser, conteniendo los datos del nuevo usuario.
+ * @param userData - Un objeto que cumple con el DTO RegisterUserDto, conteniendo los datos del nuevo usuario.
  * @returns El documento del usuario recién guardado en la base de datos.
  * @throws Lanza un error si la operación de guardado falla (ej. por un email duplicado).
  */
-export const registerUserService = async (userData: IUser) => {
+export const registerUserService = async (userData: RegisterUserDto) => {
   try {
     // ¡Corrección de Seguridad! Forzamos el rol a 'agente'.
     const userDataWithRole = {
@@ -23,10 +25,6 @@ export const registerUserService = async (userData: IUser) => {
     };
 
     const newUser = new UserModel(userDataWithRole);
-
-    // 2. Guardamos el documento en la base de datos.
-    // Esta es una operación asíncrona, por eso usamos 'await'.
-    // ¡JUSTO ANTES de que esta línea se complete, el hook 'pre.save' de nuestro modelo se ejecutará para encriptar la contraseña!
     await newUser.save();
 
     // 3. Devolvemos el documento completo del usuario guardado.
@@ -44,11 +42,11 @@ export const registerUserService = async (userData: IUser) => {
 /**
  * Servicio para crear un nuevo usuario (acción de administrador).
  * A diferencia del registro, esta función respeta el rol proporcionado.
- * @param userData - Los datos del usuario a crear.
+ * @param userData - Un objeto que cumple con el DTO CreateUserDto.
  * @returns El documento del usuario recién guardado.
  * @throws Lanza un error si la operación falla (ej. email duplicado).
  */
-export const createUserService = async (userData: IUser) => {
+export const createUserService = async (userData: CreateUserDto) => {
   try {
     const newUser = new UserModel(userData);
     await newUser.save();
@@ -168,29 +166,20 @@ export const getAllUsersService = async () => {
 /**
  * @description Servicio para que un usuario actualice su propio perfil.
  * @param userId - El ID del usuario que se va a actualizar.
- * @param updateData - Un objeto con los campos a actualizar.
+ * @param updateData - Un objeto que cumple con el DTO UpdateUserProfileDto.
  * @returns El documento del usuario actualizado (sin la contraseña) o null si no se encuentra.
  */
-export const updateUserProfileService = async (userId: string, updateData: Partial<IUser>) => {
+export const updateUserProfileService = async (userId: string, updateData: UpdateUserProfileDto) => {
   try {
-    // 1. Regla de negocio de seguridad: Eliminamos el campo 'role' del objeto de actualización.
-    // Esto garantiza que un usuario nunca pueda escalar sus propios privilegios.
-    if (updateData.role) {
-      delete updateData.role;
-    }
-
-    // 2. Si se está actualizando la contraseña, Mongoose NO activa el hook 'pre.save'.
-    // Debemos hashearla manualmente aquí.
+    
     if (updateData.password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(updateData.password, salt);
     }
     
-    // 3. Buscamos y actualizamos al usuario en un solo paso.
-    // { new: true } asegura que Mongoose nos devuelva el documento DESPUÉS de la actualización.
     const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
-
     return updatedUser;
+
   } catch (error) {
     throw error;
   }
@@ -199,10 +188,10 @@ export const updateUserProfileService = async (userId: string, updateData: Parti
 /**
  * @description Servicio para que un administrador actualice cualquier usuario.
  * @param userId - El ID del usuario que se va a actualizar.
- * @param updateData - Un objeto con los campos a actualizar (puede incluir el rol).
+ * @param updateData - Un objeto que cumple con el DTO UpdateUserByAdminDto (puede incluir el rol).
  * @returns El documento del usuario actualizado (sin la contraseña) o null si no se encuentra.
  */
-export const updateUserByAdminService = async (userId: string, updateData: Partial<IUser>) => {
+export const updateUserByAdminService = async (userId: string, updateData: UpdateUserByAdminDto) => {
   try {
     // Si el admin envía una nueva contraseña, la hasheamos.
     if (updateData.password) {

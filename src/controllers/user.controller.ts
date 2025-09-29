@@ -1,7 +1,7 @@
 // 1. Importaciones necesarias
 import { type Request, type Response, type NextFunction } from 'express'; 
-import { registerUserService, loginUserService, getUserByIdService, getAllUsersService, createUserService, updateUserProfileService, updateUserByAdminService, deleteUserByIdService } from '../services/user.service';import { type IUser } from '../models/User.model'; // Importamos el tipo para el cuerpo de la respuesta
-
+import { registerUserService, loginUserService, getUserByIdService, getAllUsersService, createUserService, updateUserProfileService, updateUserByAdminService, deleteUserByIdService } from '../services/user.service';
+import { type RegisterUserDto, type LoginUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto } from '../dtos/user.dto';
 // --- Controladores Públicos ---
 
 /**
@@ -12,7 +12,14 @@ import { registerUserService, loginUserService, getUserByIdService, getAllUsersS
  */
 export const registerUserController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const newUser = await registerUserService(req.body);
+
+    const registerData: RegisterUserDto = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    };
+
+    const newUser = await registerUserService(registerData);
     const userResponse = { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role };
     return res.status(201).json({ message: 'Usuario registrado exitosamente', user: userResponse });
   } catch (error) {
@@ -28,11 +35,14 @@ export const registerUserController = async (req: Request, res: Response, next: 
  */
 export const loginUserController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const loginData: LoginUserDto = {
+      email: req.body.email,
+      password: req.body.password
+    };
+    if (!loginData.email || !loginData.password) {
       return res.status(400).json({ message: 'El email y la contraseña son requeridos.' });
     }
-    const data = await loginUserService(email, password);
+    const data = await loginUserService(loginData.email, loginData.password);
     return res.status(200).json({ message: 'Login exitoso', ...data });
   } catch (error) {
     // Los errores de login específicos (ej. "Credenciales inválidas") se manejarán con un código 401.
@@ -71,11 +81,27 @@ export const getUserProfileController = async (req: Request, res: Response, next
 export const updateUserProfileController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
-    const updateData = req.body;
+
+    const updateData: UpdateUserProfileDto = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    };
+
+    Object.keys(updateData).forEach(
+      key => (updateData as any)[key] === undefined && delete (updateData as any)[key]
+    );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No se proporcionaron datos válidos para actualizar.' });
+    }
+
     const updatedUser = await updateUserProfileService(userId, updateData);
+
     if (!updatedUser) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
+
     return res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
@@ -109,7 +135,15 @@ export const deleteUserAccountController = async (req: Request, res: Response, n
  */
 export const createUserController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const newUser = await createUserService(req.body);
+
+    const createData: CreateUserDto = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      role: req.body.role
+    };
+
+    const newUser = await createUserService(createData);
     const userResponse = { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role };
     return res.status(201).json({ message: 'Usuario creado exitosamente por el administrador', user: userResponse });
   } catch (error) {
@@ -163,11 +197,27 @@ export const getUserByIdController = async (req: Request, res: Response, next: N
 export const updateUserByAdminController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
     if (!id) {
       return res.status(400).json({ message: 'El ID del usuario es requerido.' });
     }
+
+    const updateData: UpdateUserByAdminDto = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      role: req.body.role
+    };
+
+    Object.keys(updateData).forEach(
+      key => (updateData as any)[key] === undefined && delete (updateData as any)[key]
+    );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No se proporcionaron datos válidos para actualizar.' });
+    }
+
     const updatedUser = await updateUserByAdminService(id, updateData);
+    
     if (!updatedUser) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
