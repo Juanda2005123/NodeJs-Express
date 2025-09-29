@@ -9,16 +9,20 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 /**
- * Crea un nuevo usuario en la base de datos.
+ * Registra un nuevo usuario con rol 'agente' en la base de datos.
  * @param userData - Un objeto que cumple con la interfaz IUser, conteniendo los datos del nuevo usuario.
  * @returns El documento del usuario recién guardado en la base de datos.
  * @throws Lanza un error si la operación de guardado falla (ej. por un email duplicado).
  */
-export const createUserService = async (userData: IUser) => {
+export const registerUserService = async (userData: IUser) => {
   try {
-    // 1. Creamos una nueva instancia del modelo de usuario con los datos recibidos.
-    // Esto es un documento de Mongoose en memoria, aún no está en la base de datos.
-    const newUser = new UserModel(userData);
+    // ¡Corrección de Seguridad! Forzamos el rol a 'agente'.
+    const userDataWithRole = {
+      ...userData,
+      role: 'agente' as const // 'as const' ayuda a TypeScript a entender que es un valor fijo
+    };
+
+    const newUser = new UserModel(userDataWithRole);
 
     // 2. Guardamos el documento en la base de datos.
     // Esta es una operación asíncrona, por eso usamos 'await'.
@@ -33,6 +37,23 @@ export const createUserService = async (userData: IUser) => {
     // Mongoose lanzará un error. Atrapamos ese error aquí.
     // En lugar de manejarlo, simplemente lo "relanzamos" hacia arriba.
     // Esto permite que la capa que llamó al servicio (el controlador) decida cómo informar al cliente final.
+    throw error;
+  }
+};
+
+/**
+ * Servicio para crear un nuevo usuario (acción de administrador).
+ * A diferencia del registro, esta función respeta el rol proporcionado.
+ * @param userData - Los datos del usuario a crear.
+ * @returns El documento del usuario recién guardado.
+ * @throws Lanza un error si la operación falla (ej. email duplicado).
+ */
+export const createUserService = async (userData: IUser) => {
+  try {
+    const newUser = new UserModel(userData);
+    await newUser.save();
+    return newUser;
+  } catch (error) {
     throw error;
   }
 };
@@ -124,6 +145,90 @@ export const getUserByIdService = async (id: string) => {
 
   } catch (error) {
     // Relanzamos el error para que el controlador lo maneje.
+    throw error;
+  }
+};
+
+
+/**
+ * Servicio para obtener una lista de todos los usuarios.
+ * @returns Un array con todos los documentos de usuario (sin la contraseña).
+ * @throws Lanza un error si la operación de búsqueda falla.
+ */
+export const getAllUsersService = async () => {
+    try {
+        const users = await UserModel.find().select('-password'); // Excluimos la contraseña
+        return users;
+
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
+ * @description Servicio para que un usuario actualice su propio perfil.
+ * @param userId - El ID del usuario que se va a actualizar.
+ * @param updateData - Un objeto con los campos a actualizar.
+ * @returns El documento del usuario actualizado (sin la contraseña) o null si no se encuentra.
+ */
+export const updateUserProfileService = async (userId: string, updateData: Partial<IUser>) => {
+  try {
+    // 1. Regla de negocio de seguridad: Eliminamos el campo 'role' del objeto de actualización.
+    // Esto garantiza que un usuario nunca pueda escalar sus propios privilegios.
+    if (updateData.role) {
+      delete updateData.role;
+    }
+
+    // 2. Si se está actualizando la contraseña, Mongoose NO activa el hook 'pre.save'.
+    // Debemos hashearla manualmente aquí.
+    if (updateData.password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(updateData.password, salt);
+    }
+    
+    // 3. Buscamos y actualizamos al usuario en un solo paso.
+    // { new: true } asegura que Mongoose nos devuelva el documento DESPUÉS de la actualización.
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
+
+    return updatedUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @description Servicio para que un administrador actualice cualquier usuario.
+ * @param userId - El ID del usuario que se va a actualizar.
+ * @param updateData - Un objeto con los campos a actualizar (puede incluir el rol).
+ * @returns El documento del usuario actualizado (sin la contraseña) o null si no se encuentra.
+ */
+export const updateUserByAdminService = async (userId: string, updateData: Partial<IUser>) => {
+  try {
+    // Si el admin envía una nueva contraseña, la hasheamos.
+    if (updateData.password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(updateData.password, salt);
+    }
+
+    // A diferencia del servicio de perfil, aquí NO eliminamos el campo 'role'.
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
+    
+    return updatedUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * @description Servicio para eliminar un usuario por su ID.
+ * @param userId - El ID del usuario a eliminar.
+ * @returns El documento del usuario que fue eliminado o null si no se encontró.
+ */
+export const deleteUserByIdService = async (userId: string) => {
+  try {
+    const deletedUser = await UserModel.findByIdAndDelete(userId);
+    return deletedUser;
+  } catch (error) {
     throw error;
   }
 };

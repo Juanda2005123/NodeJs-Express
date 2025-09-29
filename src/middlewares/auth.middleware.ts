@@ -75,3 +75,25 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     return res.status(401).json({ message: 'Token inválido o expirado.' });
   }
 };
+
+/**
+ * Middleware para verificar el rol del usuario autenticado.
+ * Debe usarse SIEMPRE DESPUÉS de authMiddleware.
+ * @param allowedRoles - Un array de strings con los roles permitidos para la ruta.
+ * @returns Una función de middleware de Express.
+ */
+export const checkRole = (allowedRoles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // 1. Damos por hecho que authMiddleware ya se ejecutó y tenemos req.user
+    const user = req.user!; // Usamos '!' porque estamos seguros de que no es undefined.
+
+    // 3. Verificamos si el rol del usuario está en la lista de roles permitidos.
+    if (allowedRoles.includes(user.role)) {
+      // 4. ¡Éxito! El usuario tiene el rol correcto. Le damos el pase.
+      next();
+    } else {
+      // 5. El usuario no tiene permisos. Le denegamos el acceso.
+      return res.status(403).json({ message: 'Acceso prohibido. No tienes los permisos necesarios.' });
+    }
+  };
+};

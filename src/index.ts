@@ -2,6 +2,8 @@ import express, { type Request, type Response } from 'express';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import userRoutes from './routes/user.routes';
+import { errorHandlerMiddleware } from './middlewares/errorHandler.middleware';
+
 
 // 1. Cargar las variables de entorno del archivo .env
 dotenv.config();
@@ -27,6 +29,9 @@ app.get('/api', (req: Request, res: Response) => {
 // Le decimos a Express: "Cualquier petición que empiece con '/api/users',
 // pásasela al router 'userRoutes' para que él decida qué hacer."
 app.use('/api/users', userRoutes);
+
+app.use(errorHandlerMiddleware);
+
 
 // 5. Poner el servidor a escuchar en el puerto especificado
 
