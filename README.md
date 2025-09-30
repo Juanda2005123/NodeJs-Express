@@ -335,6 +335,10 @@ bun run dev
 - [x] Integridad referencial con propiedades
 - [x] Optimizaciones con filtros combinados
 
+### 📋**Modulo de Tests**
+
+- [x] **Colección Postman:** Pruebas de integración completas
+
 ### 🚧 **Pendientes de Implementación**
 
 - [ ] **Despliegue en Nube:** Implementación en plataforma cloud
