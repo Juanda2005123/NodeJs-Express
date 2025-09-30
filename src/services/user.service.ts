@@ -1,9 +1,14 @@
-import UserModel from '../models/User.model';
-import PropertyModel from '../models/Property.model';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'; 
-import dotenv from 'dotenv'; 
-import { type RegisterUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto } from '../dtos/user.dto';
+import UserModel from "../models/User.model";
+import PropertyModel from "../models/Property.model";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import {
+  type RegisterUserDto,
+  type CreateUserDto,
+  type UpdateUserByAdminDto,
+  type UpdateUserProfileDto,
+} from "../dtos/user.dto";
 
 /**
  * Servicio para la lógica de negocio relacionada con los usuarios.
@@ -22,7 +27,7 @@ export const registerUserService = async (userData: RegisterUserDto) => {
     // ¡Corrección de Seguridad! Forzamos el rol a 'agente'.
     const userDataWithRole = {
       ...userData,
-      role: 'agente' as const // 'as const' ayuda a TypeScript a entender que es un valor fijo
+      role: "agente" as const, // 'as const' ayuda a TypeScript a entender que es un valor fijo
     };
 
     const newUser = new UserModel(userDataWithRole);
@@ -30,7 +35,6 @@ export const registerUserService = async (userData: RegisterUserDto) => {
 
     // 3. Devolvemos el documento completo del usuario guardado.
     return newUser;
-
   } catch (error) {
     // 4. Si 'newUser.save()' falla (por ejemplo, por la restricción 'unique' del email),
     // Mongoose lanzará un error. Atrapamos ese error aquí.
@@ -68,12 +72,12 @@ export const loginUserService = async (email: string, password: string) => {
   try {
     // 1. Buscar al usuario por su email
     // Usamos .select('+password') para incluir explícitamente la contraseña, que por defecto podría estar oculta.
-    const user = await UserModel.findOne({ email }).select('+password');
+    const user = await UserModel.findOne({ email }).select("+password");
 
     // 2. Si el usuario no existe, lanzamos un error de autenticación.
     // ¡Importante! No decimos "email no encontrado" para no dar pistas a posibles atacantes.
     if (!user) {
-      const error = new Error('Credenciales inválidas');
+      const error = new Error("Credenciales inválidas");
       (error as any).statusCode = 401;
       throw error;
     }
@@ -83,7 +87,7 @@ export const loginUserService = async (email: string, password: string) => {
 
     // 4. Si las contraseñas no coinciden, lanzamos el mismo error genérico.
     if (!isPasswordMatch) {
-      const error = new Error('Credenciales inválidas');
+      const error = new Error("Credenciales inválidas");
       (error as any).statusCode = 401;
       throw error;
     }
@@ -91,20 +95,19 @@ export const loginUserService = async (email: string, password: string) => {
     // 5. Si todo es correcto, generamos el token JWT.
     const payload = {
       id: user._id,
-      role: user.role
+      role: user.role,
     };
 
     // Leemos el secreto del JWT desde las variables de entorno. ¡NUNCA lo pongas directamente en el código!
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
-      throw new Error('La clave secreta del JWT no está configurada.');
+      throw new Error("La clave secreta del JWT no está configurada.");
     }
 
-    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' }); // El token expirará en 1 hora
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: "1h" }); // El token expirará en 1 hora
 
     // 6. Devolvemos el token y el modelo completo del usuario (el controller se encarga de serializar).
     return { token, user };
-
   } catch (error) {
     // Relanzamos el error para que el controlador lo maneje.
     throw error;
@@ -129,13 +132,11 @@ export const getUserByIdService = async (id: string) => {
 
     // 3. Devolvemos el modelo completo (el controller se encarga de serializar)
     return user;
-
   } catch (error) {
     // Relanzamos el error para que el controlador lo maneje.
     throw error;
   }
 };
-
 
 /**
  * Servicio para obtener una lista de todos los usuarios.
@@ -143,13 +144,12 @@ export const getUserByIdService = async (id: string) => {
  * @throws Lanza un error si la operación de búsqueda falla.
  */
 export const getAllUsersService = async () => {
-    try {
-        const users = await UserModel.find().select('-password'); // Excluimos la contraseña
-        return users;
-
-    } catch (error) {
-        throw error;
-    }
+  try {
+    const users = await UserModel.find().select("-password"); // Excluimos la contraseña
+    return users;
+  } catch (error) {
+    throw error;
+  }
 };
 
 /**
@@ -158,17 +158,20 @@ export const getAllUsersService = async () => {
  * @param updateData - Un objeto que cumple con el DTO UpdateUserProfileDto.
  * @returns El documento del usuario actualizado (sin la contraseña) o null si no se encuentra.
  */
-export const updateUserProfileService = async (userId: string, updateData: UpdateUserProfileDto) => {
+export const updateUserProfileService = async (
+  userId: string,
+  updateData: UpdateUserProfileDto
+) => {
   try {
-    
     if (updateData.password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(updateData.password, salt);
     }
-    
-    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
-    return updatedUser;
 
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    }).select("-password");
+    return updatedUser;
   } catch (error) {
     throw error;
   }
@@ -180,7 +183,10 @@ export const updateUserProfileService = async (userId: string, updateData: Updat
  * @param updateData - Un objeto que cumple con el DTO UpdateUserByAdminDto (puede incluir el rol).
  * @returns El documento del usuario actualizado (sin la contraseña) o null si no se encuentra.
  */
-export const updateUserByAdminService = async (userId: string, updateData: UpdateUserByAdminDto) => {
+export const updateUserByAdminService = async (
+  userId: string,
+  updateData: UpdateUserByAdminDto
+) => {
   try {
     // Si el admin envía una nueva contraseña, la hasheamos.
     if (updateData.password) {
@@ -189,8 +195,10 @@ export const updateUserByAdminService = async (userId: string, updateData: Updat
     }
 
     // A diferencia del servicio de perfil, aquí NO eliminamos el campo 'role'.
-    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
-    
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    }).select("-password");
+
     return updatedUser;
   } catch (error) {
     throw error;
@@ -208,9 +216,11 @@ export const deleteUserByIdService = async (userId: string) => {
   try {
     // VALIDACIÓN DE DEPENDENCIAS: Verificar si el usuario tiene propiedades
     const userProperties = await PropertyModel.find({ owner: userId }).limit(1);
-    
+
     if (userProperties.length > 0) {
-      const error = new Error('No se puede eliminar el usuario: tiene propiedades asignadas. Elimine primero todas sus propiedades.');
+      const error = new Error(
+        "No se puede eliminar el usuario: tiene propiedades asignadas. Elimine primero todas sus propiedades."
+      );
       (error as any).statusCode = 409; // Conflict
       throw error;
     }
