@@ -37,6 +37,39 @@
 ✅ **Supera todos los umbrales** - Configurados en 80%, alcanzado 90.75%  
 ✅ **Cero tests fallando** - 260/260 passing  
 
+## 🚀 Cómo Ejecutar los Tests
+
+### Requerimientos Previos
+
+```bash
+# Node.js v18+ o Bun runtime
+node --version  # o bun --version
+
+# Instalar dependencias
+npm install
+```
+
+### Pasos para Ejecutar
+
+#### 1️⃣ Ejecutar Todos los Tests
+
+```bash
+npm test
+```
+
+**Resultado esperado**: 260 tests passing en ~74 segundos
+
+#### 2️⃣ Generar Reporte de Cobertura
+
+```bash
+npm run test:coverage
+```
+
+**Resultado esperado**: 
+- Tests ejecutados con métricas de cobertura
+
+
 ## 📁 Reporte HTML Interactivo
 
 📄 Ver reporte completo: [`testCoverage/report/fullReport.html`](./testCoverage/report/fullReport.html)
+
