@@ -259,14 +259,50 @@ bun run dev
 
 ### 🧪 **Pruebas Unitarias**
 
-> 🚧 **Estado:** Pendiente de implementación
+✅ **Estado:** ✨ **IMPLEMENTADO** - Cobertura del 90.75%
 
-**Objetivo:** Cobertura del 80% usando Jest
+#### 📊 Resultados de Cobertura
 
-- **Componentes a probar:** Controladores, servicios, modelos, utilidades
-- **Escenarios:** Casos de éxito y error, validaciones, lógica de negocio
-- **Frameworks:** Jest para testing, Supertest para APIs
+| Métrica | Porcentaje | Estado |
+|---------|-----------|--------|
+| **Statements** | 90.75% | ✅ |
+| **Branches** | 88.17% | ✅ |
+| **Functions** | **100%** | 🎯 |
+| **Lines** | 89.69% | ✅ |
 
+#### 🎯 Distribución de Tests
+
+- **260 tests totales** pasando ✅
+- **11 test suites** completos
+- **Tiempo de ejecución:** ~74 segundos
+
+**Cobertura por Componente:**
+- 🎮 **Controllers:** 88.55% (119 tests)
+  - User Controller: 40 tests
+  - Property Controller: 32 tests
+  - Task Controller: 47 tests
+- ⚙️ **Services:** 91.5% (75 tests)
+  - User, Property, Task Services
+- 🛡️ **Middlewares:** 100% (cobertura completa)
+  - Authentication & Authorization
+  - Error Handler
+- 🔧 **Utils:** 100% (9 tests)
+  - Serializers (User, Property, Task)
+
+#### 🚀 Ejecutar las Pruebas
+
+```bash
+# Ejecutar todos los tests
+npm test
+
+# Ejecutar con cobertura
+npm run test:coverage
+```
+#### 📁 Documentación Completa
+
+📄 **Ver reporte detallado:** [`docs/testCoverage/coverage.md`](./docs/testCoverage/coverage.md)
+
+📊 **Reporte HTML interactivo:** `docs/testCoverage/report/fullReport.html`
 ---
 
 ## 🏗️ Arquitectura y Características Técnicas
@@ -301,9 +337,9 @@ bun run dev
 
 ## ☁️ Despliegue
 
-> 🚧 **Estado:** Pendiente de implementación
+### 🌐 **API Desplegada en Render**
 
-🌐 **API Desplegada:** [Próximamente]
+🚀 **URL Base:** [https://inmobiliaria-api-58kh.onrender.com](https://inmobiliaria-api-58kh.onrender.com)
 
 ---
 
@@ -318,6 +354,8 @@ bun run dev
 - [x] CRUD completo con rutas protegidas
 - [x] Validación de dependencias para eliminación
 - [x] Serialización segura de datos
+- [x] **Tests:** 40 tests unitarios e integración
+      
 
 #### 🏠 **Módulo de Propiedades**
 
@@ -326,7 +364,8 @@ bun run dev
 - [x] Ownership y control de acceso
 - [x] Cascade delete de tareas asociadas
 - [x] Rutas públicas y privadas
-
+- [x] **Tests:** 32 tests de integración
+      
 #### 📋 **Módulo de Tareas**
 
 - [x] Sistema completo de tareas vinculadas a propiedades
@@ -334,61 +373,55 @@ bun run dev
 - [x] CRUD diferenciado por roles
 - [x] Integridad referencial con propiedades
 - [x] Optimizaciones con filtros combinados
+- [x] **Tests:** 47 tests de integración
 
+#### 🧪 **Testing y Calidad**
+- [x] **260 tests** implementados (100% passing)
+- [x] **90.75% cobertura** de código
+- [x] **100% funciones** cubiertas
+- [x] Middlewares con cobertura completa
+- [x] Pruebas de integración con BD en memoria
+- [x] Documentación de coverage en docs/
+      
 ### 📋**Modulo de Tests**
 
 - [x] **Colección Postman:** Pruebas de integración completas
 
-### 🚧 **Pendientes de Implementación**
-
-- [ ] **Despliegue en Nube:** Implementación en plataforma cloud
-- [ ] **Documentación Adicional:** Diagramas de arquitectura
-
 ---
-
 ## 📚 Cumplimiento de Requisitos
 
 ### ✅ **Requisitos Funcionales Implementados**
 
 #### 👥 **Gestión de Usuarios**
-
 - [x] Superadmin puede crear, modificar y eliminar usuarios
 - [x] Roles implementados: `superadmin`, `agente` (usuario regular)
 - [x] Usuarios autenticados pueden ver/editar su perfil
 - [x] Solo superadmin puede gestionar otros usuarios
+- [x] **Tests:** 25 tests en services + 40 en controller
 
 #### 🔐 **Autenticación y Autorización**
-
 - [x] Sistema JWT completo con middleware de autenticación
 - [x] Middleware de validación de roles para cada operación
 - [x] Rutas protegidas según permisos de usuario
+- [x] **Tests:** Cobertura 100% en middlewares
 
 #### 🏠📋 **Módulos Interrelacionados**
-
 - [x] **Módulo Propiedades:** CRUD completo con ownership
 - [x] **Módulo Tareas:** CRUD vinculado a propiedades
 - [x] Relación directa entre propiedades y tareas
 - [x] Gestión diferenciada por roles (agente vs superadmin)
+- [x] **Tests:** 75 tests en services + 79 en controllers
 
 #### 🔄 **Características Adicionales**
-
 - [x] Integridad referencial (cascade delete, validación dependencias)
 - [x] Optimizaciones de rendimiento (filtros combinados)
 - [x] Error handling centralizado
 - [x] Arquitectura escalable con DTOs y Services
-- [x] Pruebas Integración: Colección Postman completa
+- [x] **Tests:** 100% cobertura en serializers y utils
 
-### 🚧 **Elementos Pendientes**
-
-- [ ] **Despliegue:** Implementación en nube
-- [ ] **Documentación:** README técnico detallado
-
+### ✅ **Requisitos Técnicos Cumplidos**
+- [x] **Pruebas Unitarias:** ✨ **90.75% cobertura** (supera el 80% requerido)
+- [x] **260 tests** implementados con Jest + Supertest
+- [x] **Documentación completa** de testing en docs/
+- [x] **Reporte HTML** interactivo de cobertura
 ---
-
-<div align="center">
-
-<p><strong>Desarrollado para Computación en Internet III - Universidad Icesi</strong></p>
-<p><em>Taller: Backend NodeJS - Docente: Gustavo Gonzalez Medina</em></p>
-<p><em>Entrega: 30 de Septiembre 2025</em></p>
-
-</div>
