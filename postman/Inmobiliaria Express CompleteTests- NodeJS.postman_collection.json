@@ -1,0 +1,1941 @@
+{
+	"info": {
+		"_postman_id": "f047cd4d-ee7c-40f2-9290-c595da4282dd",
+		"name": "Inmobiliaria Express - NodeJS",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43961941",
+		"_collection_link": "https://juancano-6664789.postman.co/workspace/309feba3-72c6-410e-a2a8-3cd4ae42cdbe/collection/43961941-f047cd4d-ee7c-40f2-9290-c595da4282dd?action=share&source=collection_link&creator=43961941"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Agente 007\",\n  \"email\": \"james.bond@icesi.edu\",\n  \"password\": \"shaken_not_stirred\",\n  \"role\": \"agente\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Este script se ejecuta DESPUÉS de recibir la respuesta del login.\r",
+									"pm.test(\"Token fue recibido y guardado en la colección\", function () {\r",
+									"    // Convierte la respuesta JSON en un objeto JavaScript.\r",
+									"    const jsonData = pm.response.json();\r",
+									"\r",
+									"    // Si el objeto de respuesta existe y tiene una propiedad \"token\"...\r",
+									"    if (jsonData && jsonData.token) {\r",
+									"        // ...guárdala en una VARIABLE DE COLECCIÓN llamada \"jwt_token\".\r",
+									"        pm.collectionVariables.set(\"jwt_token\", jsonData.token);\r",
+									"        pm.globals.set(\"jwt_token\", jsonData.token);\r",
+									"        pm.environment.set(\"jwt_token\", jsonData.token);\r",
+									"        console.log(\"Token JWT guardado en las variables de la colección.\");\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"james.bond@icesi.edu\",\r\n  \"password\": \"shaken_not_stirred\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Authorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users Unauthorized Role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful PUT request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Agente 008\",\n  \"email\": \"talkToMe@u.icesi.edu\",\n  \"role\": \"agente\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Login SuperUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Este script se ejecuta DESPUÉS de recibir la respuesta del login.\r",
+									"pm.test(\"Token fue recibido y guardado en la colección\", function () {\r",
+									"    // Convierte la respuesta JSON en un objeto JavaScript.\r",
+									"    const jsonData = pm.response.json();\r",
+									"\r",
+									"    // Si el objeto de respuesta existe y tiene una propiedad \"token\"...\r",
+									"    if (jsonData && jsonData.token) {\r",
+									"        // ...guárdala en una VARIABLE DE COLECCIÓN llamada \"jwt_token\".\r",
+									"        pm.collectionVariables.set(\"jwt_SuperToken\", jsonData.token);\r",
+									"        console.log(\"Token JWT guardado en las variables de la colección.\");\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"superadmin@inmobiliaria.com\",\r\n  \"password\": \"superadminpassword123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users Authorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register test Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"test_agent_id\", jsonData.user.id);\r",
+									"pm.environment.set(\"test_agent_id\", jsonData.user.id);\r",
+									"pm.globals.set(\"test_agent_id\", jsonData.user.id);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Prueba\",\r\n  \"email\": \"test.agent@icesi.edu\",\r\n  \"password\": \"UnaRayaMasAlTigre\",\r\n  \"role\": \"agente\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful PUT request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Agente a Punto de Eliminacion Definitiva\",\n  \"email\": \"almost@Muerto.co\",\n  \"role\": \"superadmin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_agent_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_agent_id}}"
+							]
+						},
+						"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{test_agent_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{test_agent_id}}"
+							]
+						},
+						"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Properties",
+			"item": [
+				{
+					"name": "Create Property as Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tests para Create Property (agent)\r",
+									"pm.test(\"Create Property: status 200/201 and response shape\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+									"\r",
+									"  const json = pm.response.json();\r",
+									"  console.log(\"Create Property response:\", json);\r",
+									"\r",
+									"  // Soportar varios shapes posibles\r",
+									"  const prop = json?.property ?? json;\r",
+									"  const propId = prop?.id ?? prop?._id ?? null;\r",
+									"  // owner puede venir como { id: '...' } o como string u ObjectId\r",
+									"  const ownerId = prop?.owner?.id ?? prop?.owner?._id ?? (typeof prop?.owner === 'string' ? prop.owner : null);\r",
+									"\r",
+									"  pm.expect(propId, \"No property id encontrado en response (property.id o property._id)\").to.be.ok;\r",
+									"  pm.expect(prop?.title, \"No se encontró title en la propiedad\").to.be.ok;\r",
+									"\r",
+									"  // Guardar variables de colección\r",
+									"  pm.collectionVariables.set(\"test_property_id\", propId.toString());\r",
+									"  if (ownerId) pm.collectionVariables.set(\"test_property_owner_id\", ownerId.toString());\r",
+									"\r",
+									"  console.log(\"Saved collection variables: test_property_id =\", propId, \" test_property_owner_id =\", ownerId);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Casa Test Agent\",\r\n  \"description\": \"Propiedad creada por agente para tests\",\r\n  \"price\": 120000,\r\n  \"location\": \"Calle Test 123\",\r\n  \"area\":16\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/agent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"agent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Second Property",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tests para Create Property (agent)\r",
+									"pm.test(\"Create Property: status 200/201 and response shape\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+									"\r",
+									"  const json = pm.response.json();\r",
+									"  console.log(\"Create Property response:\", json);\r",
+									"\r",
+									"  // Soportar varios shapes posibles\r",
+									"  const prop = json?.property ?? json;\r",
+									"  const propId = prop?.id ?? prop?._id ?? null;\r",
+									"  // owner puede venir como { id: '...' } o como string u ObjectId\r",
+									"  const ownerId = prop?.owner?.id ?? prop?.owner?._id ?? (typeof prop?.owner === 'string' ? prop.owner : null);\r",
+									"\r",
+									"  pm.expect(propId, \"No property id encontrado en response (property.id o property._id)\").to.be.ok;\r",
+									"  pm.expect(prop?.title, \"No se encontró title en la propiedad\").to.be.ok;\r",
+									"\r",
+									"  // Guardar variables de colección\r",
+									"  pm.collectionVariables.set(\"second_test_property_id\", propId.toString());\r",
+									"  if (ownerId) pm.collectionVariables.set(\"second_test_property_owner_id\", ownerId.toString());\r",
+									"\r",
+									"  console.log(\"Saved collection variables: test_property_id =\", propId, \" test_property_owner_id =\", ownerId);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Mansion Stark\",\r\n  \"description\": \"Propiedad con vista al mar, que se visualiza en IronMan 3\",\r\n  \"price\": 12000000000,\r\n  \"location\": \"10880 Malibu Point, Malibú, California 90265\",\r\n  \"area\":69\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/agent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"agent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Property by Id (AGENT requesting own)",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Properties as Admin",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Update Property as AGENT (own property)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Agent updates own property -> 200 and fields updated\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"  const json = pm.response.json();\r",
+									"  pm.expect(json.title).to.eql(\"Casa Test Agent - Actualizada\");\r",
+									"  pm.expect(json.price).to.eql(130000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Casa Test Agent - Actualizada\",\r\n  \"price\": 130000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/agent/{{test_property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"agent",
+								"{{test_property_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Property as AGENT (attempt on OTHER's property)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Agent cannot update property not owned -> 404/403/401\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([401,403,404]);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Intento Update Propiedad Ajena\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/agent/{{second_test_property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"agent",
+								"{{second_test_property_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Property as ADMIN (any property)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin updates property -> 200 and fields updated\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"  const json = pm.response.json();\r",
+									"  pm.expect(json.title).to.eql(\"Casa actualizada por admin\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Casa actualizada por admin\",\r\n  \"owner\": \"{{test_agent_id}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/admin/{{test_property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"admin",
+								"{{test_property_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Property as ADMIN (para pruebas con otra owner)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Property created by admin -> 201 and has _id\", () => {\r",
+									"  pm.response.to.have.status(201);\r",
+									"  const json = pm.response.json();\r",
+									"  pm.collectionVariables.set(\"test_property_other_id\", json._id);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Propiedad Admin - Other\",\r\n  \"description\": \"Prop admin\",\r\n  \"price\": 500000,\r\n  \"location\": \"Avenida Admin 1\",\r\n  \"area\": 54,\r\n  \"owner\": \"{{test_agent_id}}\"  \r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Property as AGENT (own property)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Agent deletes own property -> 200/204\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,204]);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties/agent/{{test_property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"agent",
+								"{{test_property_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checkout of Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"After property deletion, tasks for property are gone ([]) or 404\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,404]);\r",
+									"  if (pm.response.code === 200) {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.be.an(\"array\");\r",
+									"    pm.expect(json.length).to.eql(0);\r",
+									"  }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/property/{{test_property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"property",
+								"{{test_property_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Property as ADMIN (any property)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin deletes property -> 200/204\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,204]);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties/admin/{{second_test_property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"admin",
+								"{{second_test_property_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Non-existent Property",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Delete non-existent property -> 404 or null\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([404,400]);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties/admin/000000000000000000000000",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"admin",
+								"000000000000000000000000"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Property by Id (non-existent)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get non-existent property -> 404\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([404,400]);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties/000000000000000000000000",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"000000000000000000000000"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Particular Property",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties/admin/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"admin",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "Create Task as Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tests para Create Task as agent (robusto contra property como objeto o string)\r",
+									"pm.test(\"Create Task as agent -> 201/200 and save id\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+									"\r",
+									"  const json = pm.response.json();\r",
+									"  console.log(\"Create Task response:\", json);\r",
+									"\r",
+									"  // task puede venir en json.task o en la raíz\r",
+									"  const task = json?.task ?? json;\r",
+									"\r",
+									"  // extraer task id\r",
+									"  const taskId = task?.id ?? task?._id ?? null;\r",
+									"  pm.expect(taskId, \"No task id encontrado en la respuesta\").to.be.ok;\r",
+									"\r",
+									"  // extraer propertyId robustamente (property puede ser string o objeto)\r",
+									"  let propertyId;\r",
+									"  if (!task.property) {\r",
+									"    propertyId = null;\r",
+									"  } else if (typeof task.property === 'string') {\r",
+									"    propertyId = task.property;\r",
+									"  } else {\r",
+									"    // objeto poblado: puede traer .id o ._id\r",
+									"    propertyId = task.property.id ?? task.property._id ?? (task.property._id ? task.property._id.toString() : undefined);\r",
+									"  }\r",
+									"  pm.expect(propertyId, \"Task property missing (no id found)\").to.be.ok;\r",
+									"\r",
+									"  // comparar con test_property_id\r",
+									"  pm.expect(propertyId.toString()).to.eql(pm.collectionVariables.get(\"test_property_id\"));\r",
+									"\r",
+									"  // extraer assignedTo (puede ser id string o objeto)\r",
+									"  let assignedToId;\r",
+									"  if (!task.assignedTo) {\r",
+									"    assignedToId = null;\r",
+									"  } else if (typeof task.assignedTo === 'string') {\r",
+									"    assignedToId = task.assignedTo;\r",
+									"  } else {\r",
+									"    assignedToId = task.assignedTo.id ?? task.assignedTo._id ?? (task.assignedTo._id ? task.assignedTo._id.toString() : undefined);\r",
+									"  }\r",
+									"  pm.expect(assignedToId, \"assignedTo missing\").to.be.ok;\r",
+									"\r",
+									"  // regla de negocio: assignedTo debe ser el agente que crea la tarea\r",
+									"  pm.expect(assignedToId.toString()).to.eql(pm.collectionVariables.get(\"test_agent_id\"));\r",
+									"\r",
+									"  // guardar task id en collection variables\r",
+									"  pm.collectionVariables.set(\"test_task_id\", taskId.toString());\r",
+									"  console.log(\"Saved test_task_id =\", taskId);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Inspección mensual\",\r\n  \"description\": \"Revisar sistema eléctrico\",\r\n  \"property\": \"{{second_test_property_id}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/tasks/agent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"agent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE TASK AS ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Create Task as admin -> 201 and assignedTo = property.owner\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+									"  const json = pm.response.json();\r",
+									"  const task = json?.task ?? json;\r",
+									"  pm.expect(task?.id ?? task?._id).to.be.ok;\r",
+									"  // assignedTo should equal owner of property (you have test_property_owner_id)\r",
+									"  const assignedTo = typeof task.assignedTo === 'object' ? (task.assignedTo.id ?? task.assignedTo._id) : task.assignedTo;\r",
+									"  pm.expect(assignedTo.toString()).to.eql(pm.collectionVariables.get(\"test_property_owner_id\"));\r",
+									"    pm.collectionVariables.set(\"test_task_id\", task.id); \r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Tarea creada por admin\",\r\n  \"description\": \"Creada por superadmin\",\r\n  \"property\": \"{{test_property_id}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/tasks/admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET TASK BY ID AS AGENT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Agent gets own task -> 200 and structure\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+									"  const json = pm.response.json();\r",
+									"  const task = json?.task ?? json;\r",
+									"  const id = task?.id ?? task?._id;\r",
+									"  pm.expect(id.toString()).to.eql(pm.collectionVariables.get(\"test_task_id\"));\r",
+									"\r",
+									"  // Ensure populated fields exist\r",
+									"  pm.expect(task).to.have.property(\"property\");\r",
+									"  pm.expect(task).to.have.property(\"assignedTo\");\r",
+									"  // assignedTo no debe tener password\r",
+									"  if (typeof task.assignedTo === 'object') {\r",
+									"    pm.expect(task.assignedTo).to.not.have.property(\"password\");\r",
+									"  }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/agent/{{test_task_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"agent",
+								"{{test_task_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET TASK BY ID AS ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin gets any task -> 200\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+									"  const json = pm.response.json();\r",
+									"  const task = json?.task ?? json;\r",
+									"  pm.expect(task?.id ?? task?._id).to.be.ok;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/admin/{{test_task_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"admin",
+								"{{test_task_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL TASKS BY AGENT (their tasks)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get all tasks by agent -> 200 and array\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+									"  const json = pm.response.json();\r",
+									"  const tasks = Array.isArray(json) ? json : (json?.tasks ?? json?.data ?? []);\r",
+									"  pm.expect(tasks).to.be.an(\"array\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/agent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"agent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL TASKS (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin get all tasks -> 200 and array\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+									"  const json = pm.response.json();\r",
+									"  const tasks = Array.isArray(json) ? json : (json?.tasks ?? json?.data ?? []);\r",
+									"  pm.expect(tasks).to.be.an(\"array\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET TASKS BY PROPERTY AS AGENT (must own property)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Agent gets tasks by property -> 200 and tasks array\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+									"  const json = pm.response.json();\r",
+									"  const tasks = Array.isArray(json) ? json : (json?.tasks ?? []);\r",
+									"  pm.expect(tasks).to.be.an(\"array\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/property/{{test_property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"property",
+								"{{test_property_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE TASK AS AGENT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Agent updates own task -> 200 and updated fields\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+									"  const json = pm.response.json();\r",
+									"  const task = json?.task ?? json;\r",
+									"  pm.expect(task?.title).to.eql(\"Inspección mensual - actualizada\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Inspección mensual - actualizada\",\r\n  \"description\": \"Actualizada por agente\",\r\n  \"isCompleted\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/tasks/agent/{{test_task_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"agent",
+								"{{test_task_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE TASK AS ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin updates task, property changed and assignedTo recalculated\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+									"  const json = pm.response.json();\r",
+									"  const task = json?.task ?? json;\r",
+									"  pm.expect(task?.title).to.eql(\"Reasignada por admin\");\r",
+									"  // If property was changed, assignedTo should exist\r",
+									"  pm.expect(task).to.have.property(\"assignedTo\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Reasignada por admin\",\r\n  \"property\": \"{{second_test_property_id}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/tasks/admin/{{test_task_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"admin",
+								"{{test_task_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE TASK AS AGENT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Agent deletes own task -> 200/204\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,202,204]);\r",
+									"});\r",
+									"\r",
+									"// cleanup variable\r",
+									"pm.collectionVariables.unset(\"test_task_id\");\r",
+									"console.log(\"Removed test_task_id from collection variables.\");\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/agent/{{test_task_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"agent",
+								"{{test_task_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE TASK AS ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin deletes any task -> 200/204\", () => {\r",
+									"  pm.expect(pm.response.code).to.be.oneOf([200,204,202]);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_SuperToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/admin/{{test_task_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"admin",
+								"{{test_task_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"// Pre-request: set Authorization header if jwt_token or jwt_SuperToken exists\r",
+							"const token = pm.request.url.path.includes('admin') \r",
+							"  ? (pm.collectionVariables.get(\"jwt_SuperToken\") || pm.environment.get(\"jwt_SuperToken\"))\r",
+							"  : (pm.collectionVariables.get(\"jwt_token\") || pm.environment.get(\"jwt_token\"));\r",
+							"\r",
+							"if (token) {\r",
+							"  pm.request.headers.upsert({ key: \"Authorization\", value: \"Bearer \" + token });\r",
+							"}\r",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "jwt_token",
+			"value": ""
+		},
+		{
+			"key": "jwt_SuperToken",
+			"value": ""
+		},
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "test_agent_id",
+			"value": ""
+		},
+		{
+			"key": "test_property_id",
+			"value": ""
+		},
+		{
+			"key": "test_property_owner_id",
+			"value": ""
+		},
+		{
+			"key": "second_test_property_id",
+			"value": ""
+		},
+		{
+			"key": "second_test_property_owner_id",
+			"value": ""
+		},
+		{
+			"key": "test_task_id",
+			"value": ""
+		}
+	]
+}
