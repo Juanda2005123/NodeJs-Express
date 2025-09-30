@@ -14,4 +14,10 @@ afterAll(() => {
 });
 
 // Aumentar timeout para pruebas de BD
-jest.setTimeout(30000);
+// Solo aplicar si jest está disponible (no en Bun test)
+if (typeof jest !== 'undefined') {
+  jest.setTimeout(30000);
+}
+
+// Suprimir warnings de deprecación de MongoDB Memory Server
+process.env.SUPPRESS_NO_CONFIG_WARNING = 'true';

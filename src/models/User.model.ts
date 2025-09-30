@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 // Contrato que define la estructura de un usuario en TypeScript
 export interface IUser {

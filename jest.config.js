@@ -22,12 +22,17 @@ export default {
       },
     },
     moduleFileExtensions: ['ts', 'js', 'json'],
-    verbose: true,
+    verbose: false, // Reducir verbosidad para evitar spam
     forceExit: true,
+    detectOpenHandles: true,
+    maxWorkers: 1, // Solo un worker para evitar conflictos con MongoDB
     clearMocks: true,
     resetMocks: true,
     restoreMocks: true,
     setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+    testTimeout: 30000, // 30 segundos global
+    // Configuración específica para evitar memory leaks
+    logHeapUsage: false,
     globals: {
       'ts-jest': {
         useESM: true,

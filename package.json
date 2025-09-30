@@ -11,6 +11,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.5.2",
     "@types/supertest": "^6.0.3",
+    "cross-env": "^10.1.0",
     "jest": "^30.2.0",
     "mongodb-memory-server": "^10.2.1",
     "supertest": "^7.1.4",
@@ -22,10 +23,11 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "db:seed": "bun run scripts/seed.ts",
-    "test": "NODE_ENV=test jest --detectOpenHandles",
-    "test:watch": "NODE_ENV=test jest --watch",
-    "test:coverage": "NODE_ENV=test jest --coverage",
-    "test:verbose": "NODE_ENV=test jest --verbose"
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit --maxWorkers=1",
+    "test:watch": "cross-env NODE_ENV=test jest --watch --detectOpenHandles --maxWorkers=1",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles --forceExit --maxWorkers=1",
+    "test:verbose": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles --forceExit --maxWorkers=1"
+
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

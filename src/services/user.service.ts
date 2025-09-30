@@ -1,15 +1,15 @@
 import UserModel from '../models/User.model';
 import PropertyModel from '../models/Property.model';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'; 
-import dotenv from 'dotenv'; 
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken'; 
+import { config } from 'dotenv'; 
 import { type RegisterUserDto, type CreateUserDto, type UpdateUserByAdminDto, type UpdateUserProfileDto } from '../dtos/user.dto';
 
 /**
  * Servicio para la lógica de negocio relacionada con los usuarios.
  */
 
-dotenv.config();
+config();
 
 /**
  * Registra un nuevo usuario con rol 'agente' en la base de datos.
