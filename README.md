@@ -235,12 +235,51 @@ bun run dev
 - `{{base_url}}` - URL base de la API
 
 ### 🧪 **Pruebas Unitarias**
-> 🚧 **Estado:** Pendiente de implementación
+✅ **Estado:** ✨ **IMPLEMENTADO** - Cobertura del 90.75%
 
-**Objetivo:** Cobertura del 80% usando Jest
-- **Componentes a probar:** Controladores, servicios, modelos, utilidades
-- **Escenarios:** Casos de éxito y error, validaciones, lógica de negocio
-- **Frameworks:** Jest para testing, Supertest para APIs
+#### 📊 Resultados de Cobertura
+
+| Métrica | Porcentaje | Estado |
+|---------|-----------|--------|
+| **Statements** | 90.75% | ✅ |
+| **Branches** | 88.17% | ✅ |
+| **Functions** | **100%** | 🎯 |
+| **Lines** | 89.69% | ✅ |
+
+#### 🎯 Distribución de Tests
+
+- **260 tests totales** pasando ✅
+- **11 test suites** completos
+- **Tiempo de ejecución:** ~74 segundos
+
+**Cobertura por Componente:**
+- 🎮 **Controllers:** 88.55% (119 tests)
+  - User Controller: 40 tests
+  - Property Controller: 32 tests
+  - Task Controller: 47 tests
+- ⚙️ **Services:** 91.5% (75 tests)
+  - User, Property, Task Services
+- 🛡️ **Middlewares:** 100% (cobertura completa)
+  - Authentication & Authorization
+  - Error Handler
+- 🔧 **Utils:** 100% (9 tests)
+  - Serializers (User, Property, Task)
+
+#### 🚀 Ejecutar las Pruebas
+
+```bash
+# Ejecutar todos los tests
+npm test
+
+# Ejecutar con cobertura
+npm run test:coverage
+```
+
+#### 📁 Documentación Completa
+
+📄 **Ver reporte detallado:** [`docs/testCoverage/coverage.md`](./docs/testCoverage/coverage.md)
+
+📊 **Reporte HTML interactivo:** `docs/testCoverage/report/fullReport.html`
 
 ---
 
@@ -303,8 +342,15 @@ bun run dev
 - [x] Integridad referencial con propiedades
 - [x] Optimizaciones con filtros combinados
 
+#### 🧪 **Testing y Calidad**
+- [x] **260 tests** implementados (100% passing)
+- [x] **90.75% cobertura** de código
+- [x] **100% funciones** cubiertas
+- [x] Middlewares con cobertura completa
+- [x] Pruebas de integración con BD en memoria
+- [x] Documentación de coverage en docs/
+
 ### 🚧 **Pendientes de Implementación**
-- [ ] **Pruebas Unitarias:** Cobertura del 80% con Jest
 - [ ] **Despliegue en Nube:** Implementación en plataforma cloud
 - [ ] **Colección Postman:** Pruebas de integración completas
 - [ ] **Documentación Adicional:** Diagramas de arquitectura
@@ -339,7 +385,6 @@ bun run dev
 - [x] Arquitectura escalable con DTOs y Services
 
 ### 🚧 **Elementos Pendientes**
-- [ ] **Pruebas Unitarias:** 80% cobertura con Jest
 - [ ] **Pruebas Integración:** Colección Postman completa
 - [ ] **Despliegue:** Implementación en nube
 - [ ] **Documentación:** README técnico detallado
