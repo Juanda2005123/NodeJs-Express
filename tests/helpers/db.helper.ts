@@ -114,7 +114,7 @@ export const clearTestDB = async () => {
       if (collection) {
         try {
           // Usar timeout de 10 segundos para cada operación de limpieza
-          let timeoutId: NodeJS.Timeout;
+          let timeoutId: NodeJS.Timeout | undefined;
           const timeoutPromise = new Promise((_, reject) => {
             timeoutId = setTimeout(() => reject(new Error('Timeout limpiando colección')), 10000);
           });
@@ -125,7 +125,9 @@ export const clearTestDB = async () => {
             await Promise.race([clearPromise, timeoutPromise]);
           } finally {
             // Limpiar el timeout para evitar handles abiertos
-            clearTimeout(timeoutId);
+            if (timeoutId) {
+              clearTimeout(timeoutId);
+            }          
           }
         } catch (error: any) {
           console.warn(`⚠️  No se pudo limpiar la colección ${name}:`, error.message);
@@ -137,16 +139,18 @@ export const clearTestDB = async () => {
     console.log('🧹 Base de datos limpiada');
     
   } catch (error) {
-    console.warn('⚠️  Error general limpiando base de datos:', error.message);
-    
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    console.warn('⚠️  Error general limpiando base de datos:', errorMessage);
+
     // Si falla la limpieza, intentar reconectar para la siguiente prueba
-    if (error.message.includes('connection') || error.message.includes('timeout')) {
+    if (error instanceof Error && (error.message.includes('connection') || error.message.includes('timeout'))) {
       console.log('🔄 Intentando reconexión por error de limpieza...');
       isConnected = false;
       try {
         await connectTestDB();
       } catch (reconnectError) {
-        console.error('❌ Error en reconexión:', reconnectError.message);
+        const reconnectErrorMessage = reconnectError instanceof Error ? reconnectError.message : 'Error desconocido';
+        console.error('❌ Error en reconexión:', reconnectErrorMessage);
       }
     }
   }
