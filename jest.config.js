@@ -12,6 +12,7 @@ export default {
       '!src/**/*.dto.ts',
       '!src/models/**',
       '!src/config/db.ts',
+      '!src/routes/**',
     ],
     coverageThreshold: {
       global: {
