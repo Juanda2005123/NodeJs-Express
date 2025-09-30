@@ -27,7 +27,6 @@
     "test:watch": "cross-env NODE_ENV=test jest --watch --detectOpenHandles --maxWorkers=1",
     "test:coverage": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles --forceExit --maxWorkers=1",
     "test:verbose": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles --forceExit --maxWorkers=1"
-
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

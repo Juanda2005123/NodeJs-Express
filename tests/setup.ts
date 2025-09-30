@@ -1,7 +1,13 @@
 // tests/setup.ts
 import { config } from 'dotenv';
 
-// Cargar variables de entorno de prueba
+// Configurar variables de entorno antes de cualquier otra cosa
+process.env.NODE_ENV = 'test';
+process.env.JWT_SECRET = 'test-secret-key-for-jwt-tokens-in-testing-environment';
+process.env.PORT = '3001';
+process.env.SUPPRESS_NO_CONFIG_WARNING = 'true';
+
+// Intentar cargar variables de entorno de .env.test si existe
 config({ path: '.env.test' });
 
 // Configuración global de Jest
@@ -18,6 +24,3 @@ afterAll(() => {
 if (typeof jest !== 'undefined') {
   jest.setTimeout(30000);
 }
-
-// Suprimir warnings de deprecación de MongoDB Memory Server
-process.env.SUPPRESS_NO_CONFIG_WARNING = 'true';

@@ -114,14 +114,20 @@ export const clearTestDB = async () => {
       if (collection) {
         try {
           // Usar timeout de 10 segundos para cada operación de limpieza
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout limpiando colección')), 10000)
-          );
+          let timeoutId: NodeJS.Timeout;
+          const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Timeout limpiando colección')), 10000);
+          });
           
           const clearPromise = collection.deleteMany({});
           
-          await Promise.race([clearPromise, timeoutPromise]);
-        } catch (error) {
+          try {
+            await Promise.race([clearPromise, timeoutPromise]);
+          } finally {
+            // Limpiar el timeout para evitar handles abiertos
+            clearTimeout(timeoutId);
+          }
+        } catch (error: any) {
           console.warn(`⚠️  No se pudo limpiar la colección ${name}:`, error.message);
         }
       }
