@@ -27,8 +27,8 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     
-    // Jest types
-    "types": ["node", "@types/jest"]
+    // Tipos necesarios en producción
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
